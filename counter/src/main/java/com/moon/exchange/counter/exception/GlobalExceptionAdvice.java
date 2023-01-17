@@ -29,9 +29,10 @@ public class GlobalExceptionAdvice {
     @ExceptionHandler(value = Exception.class)
     @ResponseBody
     @ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR)
-    public UnifyResponse<Object> handleException(HttpServletRequest request) {
+    public UnifyResponse<Object> handleException(Exception e, HttpServletRequest request) {
         String requestMessage = this.getRequestMessage(request);
         String message = this.configuration.getMessage(9999);
+        e.printStackTrace();
         return UnifyResponse.fail(9999, message, requestMessage);
     }
 

@@ -13,8 +13,8 @@ import java.util.concurrent.TimeUnit;
  * @author Chanmoey
  * @date 2023年01月14日
  */
-@PropertySource(value = "classpath:config/security.properties")
 @Component
+@PropertySource(value = "classpath:config/security.properties")
 public class RedisStringCache {
 
     private static RedisStringCache redisStringCache;
@@ -77,11 +77,26 @@ public class RedisStringCache {
 
     public static void cache(String key, String value, CacheType cacheType) {
 
-        int expireTime = switch (cacheType) {
-            case ACCOUNT -> redisStringCache.getAccountExpireTime();
-            case CAPTCHA -> redisStringCache.getCaptchaExpireTime();
-            case ORDER, TRADE, POSI -> redisStringCache.getOrderExpireTime();
-        };
+        int expireTime;
+
+        switch (cacheType) {
+            case ACCOUNT:
+                expireTime = redisStringCache.getAccountExpireTime();
+                break;
+            case CAPTCHA:
+                expireTime = redisStringCache.getCaptchaExpireTime();
+                break;
+            case ORDER:
+
+            case TRADE:
+
+            case POSI:
+                expireTime = redisStringCache.getOrderExpireTime();
+                break;
+            default:
+                expireTime = 10;
+
+        }
 
         redisStringCache.getTemplate()
                 .opsForValue()

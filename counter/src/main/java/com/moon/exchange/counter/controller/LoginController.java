@@ -8,8 +8,10 @@ import com.moon.exchange.counter.dto.LoginDTO;
 import com.moon.exchange.counter.entity.User;
 import com.moon.exchange.counter.service.IUserService;
 import com.moon.exchange.counter.util.Captcha;
+import com.moon.exchange.counter.util.LocalUser;
 import com.moon.exchange.counter.vo.CaptchaVO;
 import com.moon.exchange.counter.vo.UserVO;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -48,5 +50,13 @@ public class LoginController {
         User user = userService.login(loginDTO.getUid(), loginDTO.getPassword(),
                 loginDTO.getCaptchaId(), loginDTO.getCaptcha());
         return UnifyResponse.ok(UserVO.copyFromUser(user));
+    }
+
+    @PostMapping("/logout")
+    public UnifyResponse<Object> logout(HttpServletResponse response) {
+        Long uid = LocalUser.getUid();
+        this.userService.logout(uid);
+        response.setHeader("Authorization", "");
+        return UnifyResponse.ok();
     }
 }

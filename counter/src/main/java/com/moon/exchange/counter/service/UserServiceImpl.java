@@ -53,4 +53,10 @@ public class UserServiceImpl implements IUserService {
 
         return user;
     }
+
+    @Override
+    public void logout(Long uid) {
+        // 清除Redis的数据
+        RedisStringCache.remove(String.valueOf(uid), CacheType.ACCOUNT);
+    }
 }

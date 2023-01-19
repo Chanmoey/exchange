@@ -9,4 +9,6 @@ import com.moon.exchange.counter.entity.User;
 public interface IUserService {
 
     User login(Long uid, String password, String captchaId, String captcha);
+
+    void logout(Long uid);
 }

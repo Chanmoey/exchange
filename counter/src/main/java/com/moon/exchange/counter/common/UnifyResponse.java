@@ -49,6 +49,10 @@ public class UnifyResponse<T> {
         return new UnifyResponse<>(SUCCESS_CODE, SUCCESS_MESSAGE, null, null);
     }
 
+    public static <T> UnifyResponse<T> ok(String message) {
+        return new UnifyResponse<>(SUCCESS_CODE, message, null, null);
+    }
+
     public static <T> UnifyResponse<T> fail(int code, String message, String request) {
         return new UnifyResponse<>(code, message, request, null);
     }

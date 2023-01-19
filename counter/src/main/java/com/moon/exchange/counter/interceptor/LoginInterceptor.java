@@ -11,9 +11,7 @@ import com.moon.exchange.counter.util.LocalUser;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
-import org.springframework.web.context.request.WebRequestInterceptor;
-import org.springframework.web.servlet.handler.WebRequestHandlerInterceptorAdapter;
+import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.util.Map;
 import java.util.Optional;
@@ -22,19 +20,16 @@ import java.util.Optional;
  * @author Chanmoey
  * @date 2023年01月19日
  */
-@Component
-public class LoginInterceptor extends WebRequestHandlerInterceptorAdapter {
+public class LoginInterceptor implements HandlerInterceptor {
 
+    public LoginInterceptor() {
 
-    public LoginInterceptor(WebRequestInterceptor requestInterceptor) {
-        super(requestInterceptor);
     }
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
                              Object handler) throws Exception {
         String requestUrl = request.getRequestURI();
-        System.out.println(requestUrl);
         if (UrlWriteList.isInWriteList(requestUrl)) {
             return true;
         }
@@ -83,7 +78,6 @@ public class LoginInterceptor extends WebRequestHandlerInterceptorAdapter {
     public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
         // 请求用完，要清空数据，避免内存泄露
         LocalUser.clear();
-        super.afterCompletion(request, response, handler, ex);
     }
 
     private Long getUid(String token) {

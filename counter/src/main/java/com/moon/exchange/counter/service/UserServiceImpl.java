@@ -26,10 +26,6 @@ public class UserServiceImpl implements IUserService {
     @Override
     public User login(Long uid, String password,
                       String captchaId, String captcha) {
-        // 参数合法性校验
-        if (uid == null || StringUtils.isAnyBlank(password, captchaId, captcha)) {
-            throw new LoginException(10000);
-        }
 
         // 校验验证码
         String cacheCaptcha = RedisStringCache.get(captchaId, CacheType.CAPTCHA);

@@ -11,4 +11,6 @@ public interface IUserService {
     User login(Long uid, String password, String captchaId, String captcha);
 
     void logout(Long uid);
+
+    void changePassword(Long uid, String oldPassword, String newPassword);
 }

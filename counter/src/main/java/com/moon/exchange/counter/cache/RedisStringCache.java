@@ -80,7 +80,7 @@ public class RedisStringCache {
         int expireTime = switch (cacheType) {
             case ACCOUNT -> redisStringCache.getAccountExpireTime();
             case CAPTCHA -> redisStringCache.getCaptchaExpireTime();
-            case ORDER, TRADE, POSI -> redisStringCache.getOrderExpireTime();
+            case ORDER, TRADE, POSITION -> redisStringCache.getOrderExpireTime();
             default -> 10;
         };
 

@@ -36,7 +36,8 @@ public class UserServiceImpl implements IUserService {
         RedisStringCache.remove(captchaId, CacheType.CAPTCHA);
 
         // 校验账号密码
-        User user = userRepository.findByUidAndPassword(uid, password).orElseThrow(() -> new LoginException(10002));
+        User user = userRepository.findByUidAndPassword(uid, password).orElseThrow(
+                () -> new LoginException(10002));
         // 更改上次登录时间
         Date last = user.getLastLoginTime();
         user.setLastLoginTime(new Date());
@@ -54,5 +55,22 @@ public class UserServiceImpl implements IUserService {
     public void logout(Long uid) {
         // 清除Redis的数据
         RedisStringCache.remove(String.valueOf(uid), CacheType.ACCOUNT);
+    }
+
+    @Override
+    public void changePassword(Long uid, String oldPassword, String newPassword) {
+        User user = userRepository.findByUid(uid).orElseThrow(() -> new LoginException(10005));
+
+        if (oldPassword.equals(newPassword)) {
+            throw new LoginException(10007);
+
+        }
+
+        if (!user.getPassword().equals(oldPassword)) {
+            throw new LoginException(10006);
+        }
+
+        user.setPassword(newPassword);
+        userRepository.save(user);
     }
 }

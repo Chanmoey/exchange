@@ -7,7 +7,6 @@ import com.moon.exchange.counter.exception.bussness.LoginException;
 import com.moon.exchange.counter.repository.UserRepository;
 import com.moon.exchange.counter.token.JwtToken;
 import com.moon.exchange.counter.util.Constant;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -72,5 +71,11 @@ public class UserServiceImpl implements IUserService {
 
         user.setPassword(newPassword);
         userRepository.save(user);
+    }
+
+    @Override
+    public Long getBalance(Long uid) {
+        return userRepository.getBalanceByUid(uid)
+                .orElseThrow(() -> new LoginException(10008));
     }
 }

@@ -2,6 +2,7 @@ package com.moon.exchange.counter.repository;
 
 import com.moon.exchange.counter.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.relational.core.sql.In;
 import org.springframework.stereotype.Repository;
 
@@ -17,4 +18,7 @@ public interface UserRepository extends JpaRepository<User, In> {
     Optional<User> findByUidAndPassword(Long uid, String password);
 
     Optional<User> findByUid(Long uid);
+
+    @Query("select u.balance from User u where u.uid = :uid")
+    Optional<Long> getBalanceByUid(Long uid);
 }

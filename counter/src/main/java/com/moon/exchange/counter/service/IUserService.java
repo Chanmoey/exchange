@@ -13,4 +13,6 @@ public interface IUserService {
     void logout(Long uid);
 
     void changePassword(Long uid, String oldPassword, String newPassword);
+
+    Long getBalance(Long uid);
 }

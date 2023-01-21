@@ -2,6 +2,8 @@ package com.moon.exchange.counter;
 
 import com.moon.exchange.common.uuid.OurUuid;
 import com.moon.exchange.counter.config.SecurityConfig;
+import com.moon.exchange.counter.repository.StockRepository;
+import com.moon.exchange.counter.service.StockServiceImpl;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -13,6 +15,15 @@ import org.springframework.web.filter.CorsFilter;
 
 @SpringBootApplication
 public class CounterApplication {
+
+    /**
+     * 保证StockService最先被加入Bean容器
+     */
+//    @Autowired
+//    private StockServiceImpl stockService;
+//
+//    @Autowired
+//    private StockRepository stockRepository;
 
     @Bean
     public CorsFilter corsFilter() {

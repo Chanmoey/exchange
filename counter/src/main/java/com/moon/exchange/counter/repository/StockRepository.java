@@ -1,6 +1,5 @@
 package com.moon.exchange.counter.repository;
 
-import com.moon.exchange.counter.entity.Order;
 import com.moon.exchange.counter.entity.Stock;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -17,5 +16,6 @@ import java.util.Optional;
 public interface StockRepository extends JpaRepository<Stock, Long> {
 
     @Query("select s.name from Stock s where s.code = :code")
-    Optional<String> getNameByCode(Long code);
+    Optional<String> getNameByCode(Integer code);
+
 }

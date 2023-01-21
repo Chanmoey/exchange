@@ -24,7 +24,7 @@ public class Position {
 
     private Long uid;
 
-    private Long code;
+    private Integer code;
 
     private Long cost;
 

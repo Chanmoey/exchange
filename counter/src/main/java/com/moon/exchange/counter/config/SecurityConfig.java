@@ -22,4 +22,7 @@ public class SecurityConfig {
     @Value("${counter.worker-id}")
     public long workerId;
 
+    @Value("${counter.id}")
+    public short id;
+
 }

@@ -24,7 +24,7 @@ public class Trade {
 
     private Long uid;
 
-    private Long code;
+    private Integer code;
 
     private Integer direction;
 

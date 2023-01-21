@@ -1,9 +1,6 @@
 package com.moon.exchange.counter.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
+import jakarta.persistence.*;
 import lombok.*;
 
 /**
@@ -20,11 +17,12 @@ import lombok.*;
 public class Order {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     private Long uid;
 
-    private Long code;
+    private Integer code;
 
     private Integer direction;
 
@@ -32,6 +30,9 @@ public class Order {
 
     private Long price;
 
+    /**
+     * 原始委托的数量
+     */
     private Long count;
 
     private Integer status;
@@ -42,4 +43,10 @@ public class Order {
 
     @Transient
     private String name;
+
+    /**
+     * 最终成交的数量
+     */
+    @Transient
+    private Long tradeCount;
 }

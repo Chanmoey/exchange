@@ -37,4 +37,13 @@ public class CommonMsg implements Serializable {
 
     @ToString.Exclude
     private byte[] body;
+
+    /**
+     * 校验该包是否合法
+     */
+    private boolean isLegal;
+
+    private short errCode;
+
+    private long timestamp;
 }

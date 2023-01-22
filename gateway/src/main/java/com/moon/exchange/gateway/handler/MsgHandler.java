@@ -17,7 +17,6 @@ public class MsgHandler implements IMsgHandler {
 
     private IBodyCodec bodyCodec;
 
-
     @Override
     public void onCounterData(CommonMsg msg) {
         OrderCmd orderCmd;

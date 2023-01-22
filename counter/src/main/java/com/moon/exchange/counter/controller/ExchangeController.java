@@ -6,7 +6,7 @@ import com.moon.exchange.common.order.OrderDirection;
 import com.moon.exchange.common.order.OrderType;
 import com.moon.exchange.counter.cache.StockCache;
 import com.moon.exchange.counter.common.UnifyResponse;
-import com.moon.exchange.counter.config.SecurityConfig;
+import com.moon.exchange.counter.config.CounterConfig;
 import com.moon.exchange.counter.dto.OrderDTO;
 import com.moon.exchange.counter.entity.Order;
 import com.moon.exchange.counter.entity.Position;
@@ -52,7 +52,7 @@ public class ExchangeController {
     private StockCache stockCache;
 
     @Autowired
-    private SecurityConfig config;
+    private CounterConfig config;
 
     @GetMapping("/balance")
     public UnifyResponse<Long> getBalance() {

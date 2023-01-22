@@ -46,4 +46,29 @@ public class CommonMsg implements Serializable {
     private short errCode;
 
     private long timestamp;
+
+    /**
+     * 创建CommonMsg
+     * @param data 字节数据
+     * @param checksum 校验和
+     * @param msgSrc 源
+     * @param msgDst 目的
+     * @param msgType 消息类型
+     * @param status 消息状态
+     * @param packetNo 消息编号
+     * @return CommonMsg
+     */
+    public static CommonMsg createCommonMsg(byte[] data, byte checksum, short msgSrc, short msgDst,
+                                     short msgType, byte status, long packetNo) {
+        CommonMsg msg = new CommonMsg();
+        msg.setBodyLength(data.length);
+        msg.setChecksum(checksum);
+        msg.setMsgSrc(msgSrc);
+        msg.setMsgDst(msgDst);
+        msg.setMsgType(msgType);
+        msg.setStatus(status);
+        msg.setMsgNo(packetNo);
+        msg.setBody(data);
+        return msg;
+    }
 }

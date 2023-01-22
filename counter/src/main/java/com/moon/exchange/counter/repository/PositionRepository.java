@@ -15,4 +15,6 @@ import java.util.Optional;
 public interface PositionRepository extends JpaRepository<Position, Integer> {
 
     Optional<List<Position>> findPositionsByUid(Long uid);
+
+    Position findPositionByUidAndCode(Long uid, Integer code);
 }

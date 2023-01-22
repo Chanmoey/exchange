@@ -15,4 +15,8 @@ public interface IUserService {
     void changePassword(Long uid, String oldPassword, String newPassword);
 
     Long getBalance(Long uid);
+
+    void addBalance(Long uid, long balance);
+
+    void minusBalance(Long uid, long balance);
 }

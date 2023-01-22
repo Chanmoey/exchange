@@ -1,9 +1,6 @@
 package com.moon.exchange.counter.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
+import jakarta.persistence.*;
 import lombok.*;
 
 /**
@@ -20,6 +17,7 @@ import lombok.*;
 public class Position {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     private Long uid;

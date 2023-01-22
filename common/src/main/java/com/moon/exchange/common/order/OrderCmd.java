@@ -3,13 +3,15 @@ package com.moon.exchange.common.order;
 import lombok.Builder;
 import lombok.ToString;
 
+import java.io.Serializable;
+
 /**
  * @author Chanmoey
  * @date 2023年01月21日
  */
 @Builder
 @ToString
-public class OrderCmd {
+public class OrderCmd implements Serializable {
 
     public CmdType type;
 

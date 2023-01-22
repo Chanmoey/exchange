@@ -79,15 +79,9 @@ public class ConnectHandler implements Handler<NetSocket> {
                     }
 
                     // 组装对象
-                    CommonMsg msg = new CommonMsg();
-                    msg.setBodyLength(bodyLength);
-                    msg.setChecksum(checksum);
-                    msg.setMsgSrc(msgSrc);
-                    msg.setMsgDst(msgDst);
-                    msg.setMsgType(msgType);
-                    msg.setStatus(mstStats);
-                    msg.setMsgNo(packetNo);
-                    msg.setBody(bodyBytes);
+                    CommonMsg msg = CommonMsg.createCommonMsg(bodyBytes,
+                            checksum, msgSrc, msgDst, msgType, mstStats, packetNo);
+
                     msg.setTimestamp(System.currentTimeMillis());
 
                     msgHandler.onCounterData(msg);
@@ -108,9 +102,7 @@ public class ConnectHandler implements Handler<NetSocket> {
         socket.handler(parser);
 
         // 设置异常处理器
-        socket.closeHandler(close -> {
-            msgHandler.onDisConnect(socket);
-        });
+        socket.closeHandler(close -> msgHandler.onDisConnect(socket));
 
         socket.exceptionHandler(e -> {
             msgHandler.onException(socket, e);

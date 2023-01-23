@@ -68,6 +68,8 @@ public class OrderServiceImpl {
     }
 
     public void saveOrder(OrderCmd orderCmd) {
+        // 后端自己设置时间
+        long dbTime = System.currentTimeMillis();
         Order order = new Order();
         order.setUid(orderCmd.uid);
         order.setCode(orderCmd.code);
@@ -77,8 +79,8 @@ public class OrderServiceImpl {
         order.setCount(orderCmd.volume);
         order.setTradeCount(0L);
         order.setStatus(OrderStatus.NOT_SEL.getCode());
-        order.setDate(TimeformatUtil.yyyyMMdd(orderCmd.timestamp));
-        order.setTime(TimeformatUtil.hhMMss(orderCmd.timestamp));
+        order.setDate(TimeformatUtil.yyyyMMdd(dbTime));
+        order.setTime(TimeformatUtil.hhMMss(dbTime));
 
         orderRepository.save(order);
 

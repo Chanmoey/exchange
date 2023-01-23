@@ -109,6 +109,5 @@ public class ExchangeController {
 
         this.orderService.saveOrder(cmd);
         return UnifyResponse.ok("您的委托提交成功");
-
     }
 }

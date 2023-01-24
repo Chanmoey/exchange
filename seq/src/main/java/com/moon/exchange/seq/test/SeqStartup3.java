@@ -1,5 +1,6 @@
 package com.moon.exchange.seq.test;
 
+import com.moon.exchange.common.codec.BodyCodec;
 import com.moon.exchange.seq.config.SeqConfig;
 
 /**
@@ -10,6 +11,6 @@ public class SeqStartup3 {
 
     public static void main(String[] args) throws Exception {
         String configName = "seq3.properties";
-        new SeqConfig(configName).startUp();
+        new SeqConfig(configName, new BodyCodec()).startUp();
     }
 }

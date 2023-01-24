@@ -9,7 +9,15 @@ import com.alipay.sofa.jraft.rhea.options.configured.RheaKVStoreOptionsConfigure
 import com.alipay.sofa.jraft.rhea.options.configured.StoreEngineOptionsConfigured;
 import com.alipay.sofa.jraft.rhea.storage.StorageType;
 import com.alipay.sofa.jraft.util.Endpoint;
+import com.alipay.sofa.rpc.config.ConsumerConfig;
+import com.alipay.sofa.rpc.listener.ChannelListener;
+import com.alipay.sofa.rpc.transport.AbstractChannel;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.moon.exchange.common.codec.IBodyCodec;
+import com.moon.exchange.common.fetch.IFetchService;
 import com.moon.exchange.seq.node.Node;
+import com.moon.exchange.seq.task.FetchTask;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -17,9 +25,9 @@ import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
 
 import java.io.IOException;
-import java.net.URL;
-import java.util.Objects;
+import java.util.Map;
 import java.util.Properties;
+import java.util.Timer;
 
 /**
  * @author Chanmoey
@@ -36,8 +44,19 @@ public class SeqConfig {
 
     private String serverList;
 
+    private String fetchUrls;
+
     @NonNull
     private String fileName;
+
+    @ToString.Exclude
+    @Getter
+    private Map<String, IFetchService> fetchServiceMap = Maps.newConcurrentMap();
+
+    @ToString.Exclude
+    @NonNull
+    @Getter
+    private IBodyCodec codec;
 
     @Getter
     private Node node;
@@ -48,6 +67,9 @@ public class SeqConfig {
 
         // 初始化kv store集群
         startSeqDbCluster();
+
+        // 从网关抓取委托
+        startUpFetch();
     }
 
     private void initConfig() throws IOException {
@@ -58,6 +80,7 @@ public class SeqConfig {
         dataPath = properties.getProperty("data-path");
         serveUrl = properties.getProperty("serve-url");
         serverList = properties.getProperty("server-list");
+        fetchUrls = properties.getProperty("fetch-urls");
 
         log.info("read config: {}", this);
     }
@@ -88,5 +111,44 @@ public class SeqConfig {
 
         Runtime.getRuntime().addShutdownHook(new Thread(node::stop));
         log.info("start seq node success on port: {}", ipAndPort[1]);
+    }
+
+    private void startUpFetch() {
+        // 建立与所有网关的连接
+        String[] urls = fetchUrls.split(";");
+        for (String url : urls) {
+            ConsumerConfig<IFetchService> consumerConfig = new ConsumerConfig<IFetchService>()
+                    .setInterfaceId(IFetchService.class.getName()) // 通信接口
+                    .setProtocol("bolt") // RPC通信协议
+                    .setTimeout(5000) // 超时时间
+                    .setDirectUrl(url); // 直连地址
+            consumerConfig.setOnConnect(Lists.newArrayList(new FetchChannelListListener(consumerConfig)));
+            // 第一次连接时候，不会进入监听器的onConnected方法中，所以这里需要手动put进去
+            fetchServiceMap.put(url, consumerConfig.refer());
+        }
+
+        // 启动定时任务，定时抓取数据
+        new Timer().schedule(new FetchTask(this), 5000, 1000);
+    }
+
+    @RequiredArgsConstructor
+    private class FetchChannelListListener implements ChannelListener {
+
+        @NonNull
+        private ConsumerConfig<IFetchService> config;
+
+        @Override
+        public void onConnected(AbstractChannel channel) {
+            String remoteAddr = channel.remoteAddress().toString();
+            log.info("connect to gateway: {}", remoteAddr);
+            fetchServiceMap.put(remoteAddr, config.refer());
+        }
+
+        @Override
+        public void onDisconnected(AbstractChannel channel) {
+            String remoteAddr = channel.remoteAddress().toString();
+            log.info("disconnect to gateway: {}", remoteAddr);
+            fetchServiceMap.remove(remoteAddr);
+        }
     }
 }

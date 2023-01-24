@@ -36,8 +36,7 @@ public class ConnectHandler implements Handler<NetSocket> {
 
         // 设置报文解析器parser，开始时先读20个字节的头信息
         final RecordParser parser = RecordParser.newFixed(PACKET_HEADER_LENGTH);
-        parser.setOutput(new Handler<>() {
-
+        parser.setOutput(new Handler<Buffer>() {
             //包体长
             int bodyLength = -1;
             byte checksum = -1;

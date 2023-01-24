@@ -1,6 +1,6 @@
 package com.moon.exchange.counter.entity;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.*;
 
 /**

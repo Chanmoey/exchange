@@ -2,7 +2,7 @@ package com.moon.exchange.counter;
 
 import com.moon.exchange.common.uuid.OurUuid;
 import com.moon.exchange.counter.config.CounterConfig;
-import jakarta.annotation.PostConstruct;
+import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

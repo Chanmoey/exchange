@@ -2,7 +2,7 @@ package com.moon.exchange.counter.exception;
 
 import com.moon.exchange.counter.common.UnifyResponse;
 import com.moon.exchange.counter.exception.bussness.BusinessException;
-import jakarta.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

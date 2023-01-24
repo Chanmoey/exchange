@@ -1,6 +1,7 @@
 package com.moon.exchange.common.codec;
 
 
+import com.alipay.remoting.serialization.SerializerManager;
 import com.caucho.hessian.io.Hessian2Input;
 import com.caucho.hessian.io.Hessian2Output;
 
@@ -19,21 +20,14 @@ public class BodyCodec implements IBodyCodec {
      */
     @Override
     public <T> byte[] serialize(T obj) throws Exception {
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        Hessian2Output ho = new Hessian2Output(os);
-        ho.writeObject(obj);
-        ho.getBytesOutputStream().flush();
-        ho.completeMessage();
-        ho.close();
-        return os.toByteArray();
+        return SerializerManager.getSerializer(SerializerManager.Hessian2)
+                .serialize(obj);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public <T> T deserialize(byte[] bytes, Class<T> clazz) throws Exception {
-        ByteArrayInputStream is = new ByteArrayInputStream(bytes);
-        Hessian2Input hi = new Hessian2Input(is);
-        return (T) hi.readObject(clazz);
+        return SerializerManager.getSerializer(SerializerManager.Hessian2)
+                .deserialize(bytes, clazz.getName());
     }
 
 }

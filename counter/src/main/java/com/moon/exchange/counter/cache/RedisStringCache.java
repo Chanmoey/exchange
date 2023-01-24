@@ -1,12 +1,12 @@
 package com.moon.exchange.counter.cache;
 
-import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -77,12 +77,23 @@ public class RedisStringCache {
 
     public static void cache(String key, String value, CacheType cacheType) {
 
-        int expireTime = switch (cacheType) {
-            case ACCOUNT -> redisStringCache.getAccountExpireTime();
-            case CAPTCHA -> redisStringCache.getCaptchaExpireTime();
-            case ORDER, TRADE, POSITION -> redisStringCache.getOrderExpireTime();
-            default -> 10;
-        };
+        int expireTime;
+        switch (cacheType) {
+            case ACCOUNT:
+                expireTime = redisStringCache.getAccountExpireTime();
+                break;
+            case CAPTCHA:
+                expireTime = redisStringCache.getCaptchaExpireTime();
+                break;
+            case ORDER:
+            case TRADE:
+            case POSITION:
+                expireTime = redisStringCache.getOrderExpireTime();
+                break;
+            default:
+                expireTime = 10;
+                break;
+        }
 
         redisStringCache.getTemplate()
                 .opsForValue()

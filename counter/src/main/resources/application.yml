@@ -8,12 +8,12 @@ spring:
       hibernate:
         show_sql: true
         format_sql: true
-  data:
-    redis:
-      host: 192.168.40.30
-      port: 6379
-      timeout: 6000ms
-      password: 12345678
+
+  redis:
+    host: 192.168.40.30
+    port: 6379
+    timeout: 6000ms
+    password: 12345678
 server:
   port: 8090
 

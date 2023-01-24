@@ -4,7 +4,7 @@ import com.moon.exchange.common.checksum.ICheckSum;
 import com.moon.exchange.common.codec.IBodyCodec;
 import com.moon.exchange.common.codec.IMsgCodec;
 import io.vertx.core.Vertx;
-import jakarta.annotation.PostConstruct;
+import javax.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;

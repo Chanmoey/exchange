@@ -4,7 +4,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.moon.exchange.counter.entity.Stock;
 import com.moon.exchange.counter.service.StockServiceImpl;
-import jakarta.annotation.PostConstruct;
+import javax.annotation.PostConstruct;
 import lombok.NoArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;

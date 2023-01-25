@@ -1,6 +1,7 @@
 package com.moon.exchange.matching.event;
 
 import com.moon.exchange.common.order.OrderStatus;
+import com.moon.exchange.common.quotation.MatchData;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
@@ -40,7 +41,6 @@ public final class MatchEvent {
                 .build();
 
     }
-
 
 
 }

@@ -6,7 +6,7 @@ import com.moon.exchange.common.fetch.IFetchService;
 import com.moon.exchange.common.order.OrderCmd;
 import com.moon.exchange.common.order.OrderDirection;
 import com.moon.exchange.seq.config.SeqConfig;
-import com.moon.exchange.seq.pack.CmdPack;
+import com.moon.exchange.common.pack.CmdPack;
 import io.vertx.core.buffer.Buffer;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -86,8 +86,8 @@ public class FetchTask extends TimerTask {
                             null
                     );
 
-
         } catch (Exception e) {
+            e.printStackTrace();
             log.info("encode cmd packet error", e);
         }
     }

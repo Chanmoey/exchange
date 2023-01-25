@@ -13,5 +13,4 @@
         <module>gateway</module>
         <module>seq</module>
     </modules>
-
 </project>

@@ -85,6 +85,9 @@ public class SeqConfig {
         // 初始化kv store集群
         startSeqDbCluster();
 
+        // 启动下游广播
+        startMulticast();
+
         // 从网关抓取委托
         startUpFetch();
     }

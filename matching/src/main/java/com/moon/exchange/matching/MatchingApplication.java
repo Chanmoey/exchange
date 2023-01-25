@@ -1,6 +1,6 @@
-package com.moon.exchange;
+package com.moon.exchange.matching;
 
-import com.moon.exchange.config.MatchingConfig;
+import com.moon.exchange.matching.config.MatchingConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;

@@ -37,7 +37,7 @@ public enum CmdType {
     /**
      * 行情类
      */
-    HQ_PUB(7),
+    QUOTATION_PUB(7),
 
     /**
      * 资金类

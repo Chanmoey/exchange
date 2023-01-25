@@ -1,4 +1,4 @@
-package com.moon.exchange.config;
+package com.moon.exchange.matching.config;
 
 import com.alipay.sofa.jraft.rhea.client.DefaultRheaKVStore;
 import com.alipay.sofa.jraft.rhea.client.RheaKVStore;
@@ -8,7 +8,7 @@ import com.alipay.sofa.jraft.rhea.options.RheaKVStoreOptions;
 import com.alipay.sofa.jraft.rhea.options.configured.MultiRegionRouteTableOptionsConfigured;
 import com.alipay.sofa.jraft.rhea.options.configured.PlacementDriverOptionsConfigured;
 import com.alipay.sofa.jraft.rhea.options.configured.RheaKVStoreOptionsConfigured;
-import com.moon.exchange.cache.CmdPacketQueue;
+import com.moon.exchange.matching.cache.CmdPacketQueue;
 import com.moon.exchange.common.checksum.ICheckSum;
 import com.moon.exchange.common.checksum.XorCheckSum;
 import com.moon.exchange.common.codec.BodyCodec;
@@ -16,7 +16,10 @@ import com.moon.exchange.common.codec.IBodyCodec;
 import com.moon.exchange.common.codec.IMsgCodec;
 import com.moon.exchange.common.codec.MsgCodec;
 import com.moon.exchange.common.pack.CmdPack;
-import com.moon.exchange.core.MatchingApi;
+import com.moon.exchange.matching.core.MatchingApi;
+import com.moon.exchange.matching.handler.BaseHandler;
+import com.moon.exchange.matching.handler.risk.ExistRiskHandler;
+import com.moon.exchange.matching.service.MatchingService;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.datagram.DatagramSocket;
@@ -25,6 +28,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
+import org.eclipse.collections.api.set.primitive.MutableLongSet;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.PropertySource;
@@ -70,6 +75,9 @@ public class MatchingConfig {
     private ICheckSum checkSum;
     @Setter
     private IMsgCodec msgCodec;
+
+    @Autowired
+    private MatchingService service;
 
     @Bean(name = "myMatchingConfig")
     public MatchingConfig getMatchingConfig() {
@@ -180,6 +188,16 @@ public class MatchingConfig {
             }
             return false;
         }).min(Comparator.comparing(NetworkInterface::getName)).orElse(null);
+    }
 
+    /**
+     * 启动撮合引擎
+     */
+    private void startMatching() {
+        // 1. 前置风控处理器
+        final BaseHandler riskHandler = new ExistRiskHandler(
+                service.getAllUid(),
+                service.getAllStockCode()
+        );
     }
 }

@@ -18,6 +18,9 @@ import com.moon.exchange.common.codec.IBodyCodec;
 import com.moon.exchange.common.fetch.IFetchService;
 import com.moon.exchange.seq.node.Node;
 import com.moon.exchange.seq.task.FetchTask;
+import io.vertx.core.Vertx;
+import io.vertx.core.datagram.DatagramSocket;
+import io.vertx.core.datagram.DatagramSocketOptions;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -38,20 +41,34 @@ import java.util.Timer;
 @RequiredArgsConstructor
 public class SeqConfig {
 
+    /**
+     * 分布式强一致性数据库配置
+     */
     private String dataPath;
-
     private String serveUrl;
-
     private String serverList;
 
+    /**
+     * 网关抓取配置
+     */
     private String fetchUrls;
+
+    /**
+     * 下游广播配置
+     */
+    @Getter
+    private String multicastIp;
+    @Getter
+    private int multicastPort;
+    @Getter
+    private DatagramSocket multicastSender;
 
     @NonNull
     private String fileName;
 
     @ToString.Exclude
     @Getter
-    private Map<String, IFetchService> fetchServiceMap = Maps.newConcurrentMap();
+    private final Map<String, IFetchService> fetchServiceMap = Maps.newConcurrentMap();
 
     @ToString.Exclude
     @NonNull
@@ -72,6 +89,9 @@ public class SeqConfig {
         startUpFetch();
     }
 
+    /**
+     * 从配置文件中读取数据
+     */
     private void initConfig() throws IOException {
         Properties properties = new Properties();
 
@@ -81,10 +101,15 @@ public class SeqConfig {
         serveUrl = properties.getProperty("serve-url");
         serverList = properties.getProperty("server-list");
         fetchUrls = properties.getProperty("fetch-urls");
+        multicastIp = properties.getProperty("multicast-ip");
+        multicastPort = Integer.parseInt(properties.getProperty("multicast-port"));
 
         log.info("read config: {}", this);
     }
 
+    /**
+     * 启动排队机数据库集群
+     */
     private void startSeqDbCluster() {
         final PlacementDriverOptions pdOpts = PlacementDriverOptionsConfigured
                 .newConfigured()
@@ -113,6 +138,9 @@ public class SeqConfig {
         log.info("start seq node success on port: {}", ipAndPort[1]);
     }
 
+    /**
+     * 启动与网关的连接，并开启定时任务，每5秒从网关抓取最新委托
+     */
     private void startUpFetch() {
         // 建立与所有网关的连接
         String[] urls = fetchUrls.split(";");
@@ -131,6 +159,9 @@ public class SeqConfig {
         new Timer().schedule(new FetchTask(this), 5000, 1000);
     }
 
+    /**
+     * RPC通信的监听器
+     */
     @RequiredArgsConstructor
     private class FetchChannelListListener implements ChannelListener {
 
@@ -150,5 +181,12 @@ public class SeqConfig {
             log.info("disconnect to gateway: {}", remoteAddr);
             fetchServiceMap.remove(remoteAddr);
         }
+    }
+
+    /**
+     * 启动广播器
+     */
+    private void startMulticast() {
+        multicastSender = Vertx.vertx().createDatagramSocket(new DatagramSocketOptions());
     }
 }

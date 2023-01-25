@@ -1,4 +1,4 @@
-package com.moon.exchange.seq.pack;
+package com.moon.exchange.common.pack;
 
 import com.moon.exchange.common.order.OrderCmd;
 import lombok.*;

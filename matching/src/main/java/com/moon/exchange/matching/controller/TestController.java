@@ -24,7 +24,6 @@ public class TestController {
 
     @GetMapping("/test1")
     public LongHashSet test1() {
-        LongHashSet allUid = service.getAllUid();
-        return allUid;
+        return service.getAllUid();
     }
 }

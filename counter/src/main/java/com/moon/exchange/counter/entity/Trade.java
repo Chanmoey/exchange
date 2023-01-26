@@ -1,10 +1,11 @@
 package com.moon.exchange.counter.entity;
 
+import lombok.*;
+
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-import lombok.*;
 
 /**
  * @author Chanmoey
@@ -20,7 +21,7 @@ import lombok.*;
 public class Trade {
 
     @Id
-    private Integer id;
+    private Long id;
 
     private Long uid;
 

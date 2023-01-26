@@ -1,5 +1,6 @@
 package com.moon.exchange.counter.service;
 
+import com.moon.exchange.common.order.CmdType;
 import com.moon.exchange.common.order.OrderCmd;
 import com.moon.exchange.common.order.OrderDirection;
 import com.moon.exchange.common.order.OrderStatus;
@@ -14,12 +15,15 @@ import com.moon.exchange.counter.repository.OrderRepository;
 import com.moon.exchange.counter.util.IDConverter;
 import com.moon.exchange.counter.util.JsonUtil;
 import com.moon.exchange.counter.util.TimeformatUtil;
+import io.vertx.core.buffer.Buffer;
 import lombok.extern.log4j.Log4j2;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+import static com.moon.exchange.counter.bus.consumer.MatchDataConsumer.ORDER_DATA_CACHE_ADDR;
 
 /**
  * @author Chanmoey
@@ -105,6 +109,19 @@ public class OrderServiceImpl {
             // 生成全局ID ID = long[对台ID、委托ID]
             orderCmd.oid = IDConverter.combineInt2Long(config.getId(), order.getId());
 
+            // 保存委托到缓存
+            byte[] serialize = null;
+            try {
+                serialize = config.getBodyCodec().serialize(orderCmd);
+            } catch (Exception e) {
+                log.error(e);
+            }
+            if (serialize == null) {
+                return;
+            }
+
+            config.getVertx().eventBus().send(ORDER_DATA_CACHE_ADDR, Buffer.buffer(serialize));
+
             // 打包委托OrderCmd -> CommonCmd -> TCP数据流，并发送到网关
             gatewayConnection.sendOrder(orderCmd);
             log.info(orderCmd);
@@ -116,4 +133,25 @@ public class OrderServiceImpl {
         orders.forEach(order -> order.setName(stockService.getNameByCode(order.getCode())));
     }
 
+    public void update(long uid, int orderId, OrderStatus finalMatchDataStatus) {
+        Order order = orderRepository.findById(orderId).orElseThrow(() -> new OrderException(30004));
+        order.setStatus(finalMatchDataStatus.getCode());
+        orderRepository.save(order);
+
+        // 删除Redis缓存
+        RedisStringCache.remove(Long.toString(uid), CacheType.ORDER);
+    }
+
+    public void cancelOrder(Long uid, int orderId, int code) {
+        final OrderCmd orderCmd = OrderCmd.builder()
+                .uid(uid)
+                .code(code)
+                .type(CmdType.CANCEL_ORDER)
+                .oid(IDConverter.combineInt2Long(config.getId(), orderId))
+                .build();
+        log.info("recv cancel order: {}", orderCmd);
+
+        // 撤单我们柜台无能为力，只能通过网关发送到撮合核心去处理
+        gatewayConnection.sendOrder(orderCmd);
+    }
 }

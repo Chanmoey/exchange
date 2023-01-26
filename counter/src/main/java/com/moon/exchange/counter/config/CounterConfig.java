@@ -3,14 +3,16 @@ package com.moon.exchange.counter.config;
 import com.moon.exchange.common.checksum.ICheckSum;
 import com.moon.exchange.common.codec.IBodyCodec;
 import com.moon.exchange.common.codec.IMsgCodec;
+import com.moon.exchange.counter.bus.MqttBusConsumer;
 import io.vertx.core.Vertx;
-import javax.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
+
+import javax.annotation.PostConstruct;
 
 /**
  * @author Chanmoey
@@ -69,6 +71,10 @@ public class CounterConfig {
         } catch (Exception e) {
             log.error("init config error", e);
         }
+
+        // 初始化总线连接
+        new MqttBusConsumer(subBusIp, subBusPort,
+                String.valueOf(id), msgCodec, checkSum, vertx).startUp();
     }
 
     /**
@@ -84,4 +90,13 @@ public class CounterConfig {
     private short gatewayId;
 
     private Vertx vertx = Vertx.vertx();
+
+    /**
+     * 总线通信相关配置
+     */
+    @Value("${sub-bus-ip}")
+    private String subBusIp;
+    @Value("${sub-bus-port}")
+    private int subBusPort;
+
 }

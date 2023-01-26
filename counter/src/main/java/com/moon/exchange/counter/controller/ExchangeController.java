@@ -7,6 +7,7 @@ import com.moon.exchange.common.order.OrderType;
 import com.moon.exchange.counter.cache.StockCache;
 import com.moon.exchange.counter.common.UnifyResponse;
 import com.moon.exchange.counter.config.CounterConfig;
+import com.moon.exchange.counter.dto.CancelOrderDTO;
 import com.moon.exchange.counter.dto.OrderDTO;
 import com.moon.exchange.counter.entity.Order;
 import com.moon.exchange.counter.entity.Position;
@@ -109,5 +110,13 @@ public class ExchangeController {
 
         this.orderService.saveOrder(cmd);
         return UnifyResponse.ok("您的委托提交成功");
+    }
+
+    @PostMapping("/cancel-order")
+    public UnifyResponse<Object> cancelOrder(@RequestBody CancelOrderDTO cancelOrderDTO) {
+        Long uid = LocalUser.getUid();
+        orderService.cancelOrder(uid, cancelOrderDTO.getOrderId(), cancelOrderDTO.getCode());
+
+        return UnifyResponse.ok("撤单成功");
     }
 }

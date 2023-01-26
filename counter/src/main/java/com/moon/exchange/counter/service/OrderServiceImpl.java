@@ -125,6 +125,9 @@ public class OrderServiceImpl {
             // 打包委托OrderCmd -> CommonCmd -> TCP数据流，并发送到网关
             gatewayConnection.sendOrder(orderCmd);
             log.info(orderCmd);
+
+            // 删除Redis缓存
+            RedisStringCache.remove(Long.toString(orderCmd.uid), CacheType.ORDER);
         }
     }
 

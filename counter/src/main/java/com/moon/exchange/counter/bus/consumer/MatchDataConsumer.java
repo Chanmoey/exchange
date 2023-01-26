@@ -1,15 +1,18 @@
 package com.moon.exchange.counter.bus.consumer;
 
+import com.google.common.collect.ImmutableMap;
 import com.moon.exchange.common.order.OrderCmd;
 import com.moon.exchange.common.order.OrderDirection;
 import com.moon.exchange.common.order.OrderStatus;
 import com.moon.exchange.common.quotation.MatchData;
 import com.moon.exchange.counter.config.CounterConfig;
+import com.moon.exchange.counter.repository.OrderRepository;
 import com.moon.exchange.counter.service.IUserService;
 import com.moon.exchange.counter.service.OrderServiceImpl;
 import com.moon.exchange.counter.service.PositionServiceImpl;
 import com.moon.exchange.counter.service.TradeServiceImpl;
 import com.moon.exchange.counter.util.IDConverter;
+import com.moon.exchange.counter.util.JsonUtil;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.EventBus;
 import lombok.extern.log4j.Log4j2;
@@ -25,6 +28,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.moon.exchange.counter.config.WebSocketConfig.ORDER_NOTIFY_ADDR_PREFIX;
+import static com.moon.exchange.counter.config.WebSocketConfig.TRADE_NOTIFY_ADDR_PREFIX;
+
 /**
  * @author Chanmoey
  * @date 2023年01月26日
@@ -32,6 +38,8 @@ import java.util.stream.Collectors;
 @Log4j2
 @Component
 public class MatchDataConsumer {
+    @Autowired
+    private OrderRepository orderRepository;
 
     public static final String ORDER_DATA_CACHE_ADDR = "order_data_cache_addr";
 
@@ -121,7 +129,14 @@ public class MatchDataConsumer {
                     log.error("wrong direction[{}]", orderCmd.direction);
                 }
 
-                // TODO 通知客户端
+                // 通知客户端
+                config.getVertx().eventBus()
+                        .publish(TRADE_NOTIFY_ADDR_PREFIX + orderCmd.uid,
+                                JsonUtil.toJson(
+                                        ImmutableMap.of("code", orderCmd.code,
+                                                "direction", orderCmd.direction,
+                                                "volume", md.volume)
+                                ));
             }
         }
 
@@ -146,6 +161,9 @@ public class MatchDataConsumer {
             }
         }
 
-        // TODO 通知委托终端
+        // 通知委托终端
+        config.getVertx().eventBus()
+                .publish(ORDER_NOTIFY_ADDR_PREFIX + orderCmd.uid,
+                        "");
     }
 }

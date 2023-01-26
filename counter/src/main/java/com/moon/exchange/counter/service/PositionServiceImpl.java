@@ -65,6 +65,9 @@ public class PositionServiceImpl {
             position.setCost(position.getCost() + price * volume);
             positionRepository.save(position);
         }
+
+        // 更新缓存
+        RedisStringCache.remove(String.valueOf(uid), CacheType.POSITION);
     }
 
     public void minusPosition(Long uid, Integer code, Long volume, Long price) {

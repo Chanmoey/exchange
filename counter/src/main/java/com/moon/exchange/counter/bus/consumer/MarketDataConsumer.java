@@ -2,6 +2,7 @@ package com.moon.exchange.counter.bus.consumer;
 
 import com.moon.exchange.common.quotation.L1MarketData;
 import com.moon.exchange.counter.config.CounterConfig;
+import com.moon.exchange.counter.util.JsonUtil;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.eventbus.EventBus;
 import lombok.extern.log4j.Log4j2;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 
 import static com.moon.exchange.counter.bus.MqttBusConsumer.INNER_MARKET_DATA_CACHE_ADDR;
+import static com.moon.exchange.counter.config.WebSocketConfig.L1_MARKET_DATA_PREFIX;
 
 /**
  * @author Chanmoey
@@ -59,6 +61,14 @@ public class MarketDataConsumer {
                             log.error("l1MarketData is not null and l1MarketData.timestamp > md.timestamp");
                         }
                     }
+                });
+
+        // 委托终端的行情处理器
+        eventBus.consumer(L1_MARKET_DATA_PREFIX)
+                .handler(h -> {
+                    int code = Integer.parseInt(h.headers().get("code"));
+                    L1MarketData data = l1Cache.get(code);
+                    h.reply(JsonUtil.toJson(data));
                 });
     }
 }

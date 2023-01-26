@@ -70,5 +70,8 @@ public class TradeServiceImpl {
         trade.setTime(TimeformatUtil.hhMMss(md.timestamp));
 
         tradeRepository.save(trade);
+
+        // 删除缓存
+        RedisStringCache.remove(String.valueOf(orderCmd.uid), CacheType.TRADE);
     }
 }

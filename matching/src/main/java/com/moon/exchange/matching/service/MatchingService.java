@@ -1,5 +1,6 @@
 package com.moon.exchange.matching.service;
 
+import com.moon.exchange.matching.repository.MemberRepository;
 import com.moon.exchange.matching.repository.StockRepository;
 import com.moon.exchange.matching.repository.UserRepository;
 import org.apache.commons.collections4.CollectionUtils;
@@ -22,6 +23,9 @@ public class MatchingService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private MemberRepository memberRepository;
 
     public LongHashSet getAllUid() {
         List<Long> uidList = userRepository.getAllUid();
@@ -54,5 +58,20 @@ public class MatchingService {
         return userRepository.getBalanceByUid(uid)
                 .orElseThrow(
                         () -> new IllegalArgumentException("No such user with uid: " + uid));
+    }
+
+    public short[] getAllCounterMid() {
+        List<Short> midList = memberRepository.getAllMid();
+        if (CollectionUtils.isEmpty(midList)) {
+            throw new RuntimeException("member empty");
+        }
+
+        short[] memberIds = new short[midList.size()];
+        int i = 0;
+        for (Short mid : midList) {
+            memberIds[i] = mid;
+            i++;
+        }
+        return memberIds;
     }
 }

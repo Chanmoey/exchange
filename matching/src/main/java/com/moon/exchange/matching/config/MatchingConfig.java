@@ -8,6 +8,8 @@ import com.alipay.sofa.jraft.rhea.options.RheaKVStoreOptions;
 import com.alipay.sofa.jraft.rhea.options.configured.MultiRegionRouteTableOptionsConfigured;
 import com.alipay.sofa.jraft.rhea.options.configured.PlacementDriverOptionsConfigured;
 import com.alipay.sofa.jraft.rhea.options.configured.RheaKVStoreOptionsConfigured;
+import com.moon.exchange.common.bus.IBusSender;
+import com.moon.exchange.common.bus.MqttBusSender;
 import com.moon.exchange.common.checksum.ICheckSum;
 import com.moon.exchange.common.checksum.XorCheckSum;
 import com.moon.exchange.common.codec.BodyCodec;
@@ -15,10 +17,13 @@ import com.moon.exchange.common.codec.IBodyCodec;
 import com.moon.exchange.common.codec.IMsgCodec;
 import com.moon.exchange.common.codec.MsgCodec;
 import com.moon.exchange.common.pack.CmdPack;
+import com.moon.exchange.common.quotation.MatchData;
 import com.moon.exchange.matching.cache.CmdPacketQueue;
 import com.moon.exchange.matching.core.MatchingApi;
+import com.moon.exchange.matching.core.MatchingCore;
 import com.moon.exchange.matching.handler.BaseHandler;
 import com.moon.exchange.matching.handler.match.StockMatchHandler;
+import com.moon.exchange.matching.handler.quotation.L1PubHandler;
 import com.moon.exchange.matching.handler.risk.ExistRiskHandler;
 import com.moon.exchange.matching.orderbook.GOrderBookImpl;
 import com.moon.exchange.matching.orderbook.IOrderBook;
@@ -32,6 +37,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.log4j.Log4j2;
+import org.eclipse.collections.impl.map.mutable.primitive.ShortObjectHashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -93,12 +99,20 @@ public class MatchingConfig {
 
 
     @Getter
-    private final MatchingApi matchingApi = new MatchingApi();
+    private MatchingApi matchingApi;
 
     private final Vertx vertx = Vertx.vertx();
 
     public void startUp() throws Exception {
         log.info("loading config: {}", this);
+
+        // 启动撮合核心
+        startMatching();
+
+        // 建立连接总线，初始化数据的发送
+        initPub();
+
+        // 初始化排队机的连接
         startSeqConnection();
     }
 
@@ -210,6 +224,28 @@ public class MatchingConfig {
         final BaseHandler matchHandler = new StockMatchHandler(orderBookMap);
 
         // 3. 发布处理器
+        ShortObjectHashMap<List<MatchData>> matcherEventMap =
+                new ShortObjectHashMap<>();
+        for (short mid : service.getAllCounterMid()) {
+            matcherEventMap.put(mid, new ArrayList<>());
+        }
+        final BaseHandler pubHandler = new L1PubHandler(matcherEventMap, this);
 
+        matchingApi = new MatchingCore(
+                riskHandler,
+                matchHandler,
+                pubHandler
+        ).getApi();
+    }
+
+    @Getter
+    private IBusSender busSender;
+
+    /**
+     * 初始化连接总线
+     */
+    private void initPub() {
+        busSender = new MqttBusSender(pubIp, pubPort, msgCodec, vertx);
+        busSender.startUp();
     }
 }

@@ -18,7 +18,7 @@ public class MsgConstants {
 
     //来自撮合核心5001-10000
     public static final short MATCH_ORDER_DATA = 5001;
-    public static final short MATCH_HQ_DATA = 5002;
+    public static final short MATCH_QUOTATION_DATA = 5002;
 
     public static final short MATCH_MSG_TYPE_MIN = 5001;
     public static final short MATCH_MSG_TYPE_MAX = 10000;

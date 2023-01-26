@@ -5,9 +5,9 @@ import com.moon.exchange.common.order.OrderDirection;
 import com.moon.exchange.common.order.OrderType;
 import com.moon.exchange.common.quotation.L1MarketData;
 import com.moon.exchange.matching.orderbook.MatchEvent;
-import io.netty.util.collection.IntObjectHashMap;
 import lombok.Builder;
 import lombok.ToString;
+import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 
 import java.util.List;
 
@@ -25,24 +25,24 @@ public class RbCmd {
     /**
      * 会员id，券商的id
      */
-    public final short mid;
+    public  short mid;
     /**
      * 用户id
      */
-    public final long uid;
+    public  long uid;
 
     public CmdType command;
 
-    public final int code;
+    public  int code;
 
-    public final OrderDirection direction;
+    public  OrderDirection direction;
 
-    public final long price;
+    public  long price;
 
     /**
      * 委托量
      */
-    public final long volume;
+    public  long volume;
 
     /**
      * 委托编号
@@ -52,7 +52,7 @@ public class RbCmd {
     /**
      * 订单委托类型
      */
-    public final OrderType orderType;
+    public  OrderType orderType;
 
     /**
      * 保存撮合结果

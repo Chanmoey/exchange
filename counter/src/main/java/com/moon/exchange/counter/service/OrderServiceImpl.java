@@ -78,7 +78,7 @@ public class OrderServiceImpl {
         order.setPrice(orderCmd.price);
         order.setCount(orderCmd.volume);
         order.setTradeCount(0L);
-        order.setStatus(OrderStatus.NOT_SEL.getCode());
+        order.setStatus(OrderStatus.NOT_SET.getCode());
         order.setDate(TimeformatUtil.yyyyMMdd(dbTime));
         order.setTime(TimeformatUtil.hhMMss(dbTime));
 

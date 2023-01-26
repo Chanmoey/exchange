@@ -78,7 +78,7 @@
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-core</artifactId>
-            <version>4.3.6</version>
+            <version>4.3.7</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.alipay.sofa/jraft-core -->
@@ -98,13 +98,13 @@
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-amqp-client</artifactId>
-            <version>4.3.6</version>
+            <version>4.3.7</version>
         </dependency>
 
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-mqtt</artifactId>
-            <version>4.3.6</version>
+            <version>4.3.7</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-collections4 -->

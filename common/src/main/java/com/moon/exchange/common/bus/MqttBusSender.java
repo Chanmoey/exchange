@@ -7,66 +7,65 @@ import io.vertx.core.Vertx;
 import io.vertx.mqtt.MqttClient;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import lombok.extern.log4j.Log4j2;
 
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author Chanmoey
- * @date 2023年01月26日
- */
-@Slf4j
+@Log4j2
 @RequiredArgsConstructor
 public class MqttBusSender implements IBusSender {
 
     @NonNull
     private String ip;
+
     @NonNull
     private int port;
+
     @NonNull
     private IMsgCodec msgCodec;
+
     @NonNull
     private Vertx vertx;
 
-    private volatile MqttClient sender;
 
     @Override
     public void startUp() {
-        // 连接总线
+        //连接总线
         mqttConnect();
     }
 
     private void mqttConnect() {
         MqttClient mqttClient = MqttClient.create(vertx);
-        mqttClient.connect(port, ip, res -> {
+        sender = mqttClient;
+        mqttClient.connect(port,ip, res -> {
             if (res.succeeded()) {
-                log.info("succeed to connect to mqtt bus[ip: {}, port: {}]", ip, port);
+                log.info("connect to mqtt bus[ip:{},port:{}] succeed", ip, port);
                 sender = mqttClient;
             } else {
-                // 失败重连
-                log.error("fail connect to mqtt bus[ip: {}, port: {}]", ip, port);
+                log.info("connect to mqtt bus[ip:{},port:{}] fail", ip, port);
                 mqttConnect();
             }
         });
 
-        mqttClient.closeHandler(c -> {
+
+        mqttClient.closeHandler(h -> {
             try {
                 TimeUnit.SECONDS.sleep(5);
             } catch (Exception e) {
-                log.error(String.valueOf(e));
+                log.error(e);
             }
             mqttConnect();
         });
     }
 
+    private volatile MqttClient sender;
+
     @Override
     public void publish(CommonMsg msg) {
-        sender.publish(
-                Short.toString(msg.getMsgDst()),
+        sender.publish(Short.toString(msg.getMsgDst()),
                 msgCodec.encodeToBuffer(msg),
                 MqttQoS.AT_LEAST_ONCE,
                 false,
-                false
-        );
+                false);
     }
 }

@@ -41,6 +41,7 @@ import org.eclipse.collections.impl.map.mutable.primitive.ShortObjectHashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
@@ -55,28 +56,21 @@ import java.util.List;
  * @author Chanmoey
  * @date 2023年01月25日
  */
-@Component
-@PropertySource(value = "classpath:matching.properties")
 @Getter
 @Log4j2
 @ToString
 public class MatchingConfig {
 
-    @Value("${id}")
-    private short id;
+    public MatchingConfig(MatchingService service) {
+        this.service = service;
+    }
 
-    @Value("${order-recv-ip}")
-    private String orderRecvIp;
-    @Value("${order-recv-port}")
-    private int orderRecvPort;
-
-    @Value("${pub-ip}")
-    private String pubIp;
-    @Value("${pub-port}")
-    private int pubPort;
-
-    @Value("${seq-url-list}")
-    private String seqUrlList;
+    private short id = 1003;
+    private String orderRecvIp = "230.0.0.1";
+    private int orderRecvPort = 1234;
+    private String pubIp = "192.168.40.30";
+    private int pubPort = 1883;
+    private String seqUrlList = "127.0.0.1:8891,127.0.0.1:8892,127.0.0.1:8893";
 
     @Setter
     private IBodyCodec bodyCodec;
@@ -85,18 +79,7 @@ public class MatchingConfig {
     @Setter
     private IMsgCodec msgCodec;
 
-    @Autowired
     private MatchingService service;
-
-    @Bean(name = "myMatchingConfig")
-    public MatchingConfig getMatchingConfig() {
-        MatchingConfig config = new MatchingConfig();
-        config.setBodyCodec(new BodyCodec());
-        config.setCheckSum(new XorCheckSum());
-        config.setMsgCodec(new MsgCodec());
-        return config;
-    }
-
 
     @Getter
     private MatchingApi matchingApi;
@@ -104,8 +87,6 @@ public class MatchingConfig {
     private final Vertx vertx = Vertx.vertx();
 
     public void startUp() throws Exception {
-        log.info("loading config: {}", this);
-
         // 启动撮合核心
         startMatching();
 
@@ -114,6 +95,8 @@ public class MatchingConfig {
 
         // 初始化排队机的连接
         startSeqConnection();
+
+        log.info("loading config: {}", this);
     }
 
     @Getter

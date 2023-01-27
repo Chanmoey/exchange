@@ -99,4 +99,9 @@ public class CounterConfig {
     @Value("${sub-bus-port}")
     private int subBusPort;
 
+    /**
+     * WebSocket相关
+     */
+    @Value("${pub-port}")
+    private int pubPort;
 }

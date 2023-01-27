@@ -27,13 +27,14 @@ public class MarketDataConsumer {
     @Autowired
     private CounterConfig config;
 
+    //<code,最新的五档行情>
     private IntObjectHashMap<L1MarketData> l1Cache = new IntObjectHashMap<>();
 
     @PostConstruct
     private void init() {
-        // 订阅数据
         EventBus eventBus = config.getVertx().eventBus();
-        // 处理核心发过来的行情
+
+        //处理核心发过来的行情
         eventBus.consumer(INNER_MARKET_DATA_CACHE_ADDR)
                 .handler(buffer -> {
                     Buffer body = (Buffer) buffer.body();
@@ -42,14 +43,13 @@ public class MarketDataConsumer {
                     }
 
                     L1MarketData[] marketData = null;
-
                     try {
                         marketData = config.getBodyCodec().deserialize(body.getBytes(), L1MarketData[].class);
                     } catch (Exception e) {
                         log.error(e);
                     }
 
-                    if (marketData == null || ArrayUtils.isEmpty(marketData)) {
+                    if (ArrayUtils.isEmpty(marketData)) {
                         return;
                     }
 
@@ -58,12 +58,14 @@ public class MarketDataConsumer {
                         if (l1MarketData == null || l1MarketData.timestamp < md.timestamp) {
                             l1Cache.put(md.code, md);
                         } else {
-                            log.error("l1MarketData is not null and l1MarketData.timestamp > md.timestamp");
+                            log.error("l1MarketData is null or l1MarketData.timestamp < md.timestamp");
                         }
                     }
+
+
                 });
 
-        // 委托终端的行情处理器
+
         eventBus.consumer(L1_MARKET_DATA_PREFIX)
                 .handler(h -> {
                     int code = Integer.parseInt(h.headers().get("code"));
@@ -71,4 +73,5 @@ public class MarketDataConsumer {
                     h.reply(JsonUtil.toJson(data));
                 });
     }
+
 }

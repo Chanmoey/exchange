@@ -2,10 +2,9 @@ package com.moon.exchange.counter.config;
 
 import io.vertx.core.Vertx;
 import io.vertx.ext.bridge.BridgeEventType;
-import io.vertx.ext.bridge.BridgeOptions;
 import io.vertx.ext.bridge.PermittedOptions;
 import io.vertx.ext.web.Router;
-import io.vertx.ext.web.handler.sockjs.SockJSBridgeOptions;
+import io.vertx.ext.web.handler.sockjs.BridgeOptions;
 import io.vertx.ext.web.handler.sockjs.SockJSHandler;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +22,10 @@ public class WebSocketConfig {
 
     public static final String L1_MARKET_DATA_PREFIX = "l1-market-data";
 
-    public final static String TRADE_NOTIFY_ADDR_PREFIX = "trade-change-";
+    public final static String TRADE_NOTIFY_ADDR_PREFIX = "tradechange-";
 
-    public final static String ORDER_NOTIFY_ADDR_PREFIX = "order-change-";
+    public final static String ORDER_NOTIFY_ADDR_PREFIX = "orderchange-";
+
 
     @Autowired
     private CounterConfig config;
@@ -33,13 +33,14 @@ public class WebSocketConfig {
     @PostConstruct
     private void init() {
         Vertx vertx = config.getVertx();
-        SockJSHandler sockJSHandler = SockJSHandler.create(vertx);
 
-        // 只允许成交、委托变动通过总线往外发送
-        SockJSBridgeOptions options = new SockJSBridgeOptions()
+        //只允许成交 委托的变动通过websocket总线往外发送
+        BridgeOptions options = new BridgeOptions()
                 .addInboundPermitted(new PermittedOptions().setAddress(L1_MARKET_DATA_PREFIX))
-                .addOutboundPermitted(new PermittedOptions().setAddressRegex(ORDER_NOTIFY_ADDR_PREFIX))
-                .addOutboundPermitted(new PermittedOptions().setAddressRegex(TRADE_NOTIFY_ADDR_PREFIX));
+                .addOutboundPermitted(new PermittedOptions().setAddressRegex(ORDER_NOTIFY_ADDR_PREFIX + "[0-9]+"  ))
+                .addOutboundPermitted(new PermittedOptions().setAddressRegex(TRADE_NOTIFY_ADDR_PREFIX + "[0-9]+"));
+
+        SockJSHandler sockJSHandler = SockJSHandler.create(vertx);
         sockJSHandler.bridge(options, event -> {
             if (event.type() == BridgeEventType.SOCKET_CREATED) {
                 log.info("client : {} connected", event.socket().remoteAddress());
@@ -50,8 +51,7 @@ public class WebSocketConfig {
         });
 
         Router router = Router.router(vertx);
-
-        router.route("/event-bus/*").handler(sockJSHandler);
-        vertx.createHttpServer().requestHandler(router).listen(config.getSendPort());
+        router.route("/eventbus/*").handler(sockJSHandler);
+        vertx.createHttpServer().requestHandler(router).listen(config.getPubPort());
     }
 }

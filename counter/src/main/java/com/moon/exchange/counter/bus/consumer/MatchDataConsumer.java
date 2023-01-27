@@ -110,7 +110,7 @@ public class MatchDataConsumer {
 
                         // 这里拿到的是数据库中t_order的主键id
                         int orderId = IDConverter.separateLong2Int(oid)[1];
-
+                        log.info("MatchDataConsumer: 收到撮合数据: {}", orderId);
                         updateAndNotify(orderId, entry.getValue(), oidOrderMap.get(oid));
                     }
                 });

@@ -49,7 +49,7 @@ public class MatchingCore {
 
         this.api = new MatchingApi(disruptor.getRingBuffer());
 
-        // 全局移除处理
+        // 全局异常处理
         final DisruptorExceptionHandler<RbCmd> exceptionHandler =
                 new DisruptorExceptionHandler<>(
                         "main",

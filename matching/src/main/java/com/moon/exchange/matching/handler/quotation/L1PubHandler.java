@@ -63,7 +63,7 @@ public class L1PubHandler extends BaseHandler {
 
     private void pubMarketData(IntObjectHashMap<L1MarketData> marketDataMap) {
         // 次日志是为了调试方便
-        log.info(marketDataMap);
+        log.info("市场数据" + marketDataMap);
         byte[] serialize = null;
         try {
             serialize = config.getBodyCodec().serialize(marketDataMap.values().toArray(new L1MarketData[0]));
@@ -99,7 +99,7 @@ public class L1PubHandler extends BaseHandler {
         }
 
         // 开发调试日志
-        log.info(matcherEventMap);
+        log.info("撮合数据" + matcherEventMap);
 
         try {
             for (ShortObjectPair<List<MatchData>> s : matcherEventMap.keyValuesView()) {

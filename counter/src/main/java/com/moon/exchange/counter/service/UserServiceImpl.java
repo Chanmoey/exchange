@@ -77,8 +77,19 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public Long getBalance(Long uid) {
-        return userRepository.getBalanceByUid(uid)
+        String balanceStr = RedisStringCache.get(uid.toString(), CacheType.BALANCE);
+
+
+        if (balanceStr != null) {
+            return Long.parseLong(balanceStr);
+        }
+
+        Long balance = userRepository.getBalanceByUid(uid)
                 .orElseThrow(() -> new LoginException(10008));
+
+        RedisStringCache.cache(uid.toString(), balance.toString(), CacheType.BALANCE);
+
+        return balance;
     }
 
     @Override
@@ -91,6 +102,8 @@ public class UserServiceImpl implements IUserService {
         }
         user.setBalance(newMoney);
         userRepository.save(user);
+        // 更新缓存
+        RedisStringCache.cache(uid.toString(), String.valueOf(newMoney), CacheType.BALANCE);
     }
 
     @Override

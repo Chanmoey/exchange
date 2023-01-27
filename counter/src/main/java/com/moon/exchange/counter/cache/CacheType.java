@@ -14,7 +14,9 @@ public enum CacheType {
 
     TRADE("trade:"),
 
-    POSITION("position:");
+    POSITION("position:"),
+
+    BALANCE("balance");
 
     private final String type;
 

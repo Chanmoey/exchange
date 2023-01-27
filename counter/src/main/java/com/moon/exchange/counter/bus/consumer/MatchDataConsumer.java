@@ -66,6 +66,20 @@ public class MatchDataConsumer {
     @PostConstruct
     private void init() {
         EventBus eventBus = config.getVertx().eventBus();
+
+        // 接受委托缓存（从终端来）
+        eventBus.consumer("ORDER_DATA_CACHE_ADDR")
+                .handler(buffer -> {
+                    Buffer body = (Buffer) buffer.body();
+                    try {
+                        OrderCmd om = config.getBodyCodec().deserialize(body.getBytes(), OrderCmd.class);
+                        log.info("cache order: {}", om);
+                        oidOrderMap.put(om.oid, om);
+                    } catch (Exception e) {
+                        log.error(e);
+                    }
+                });
+
         eventBus.consumer("INNER_MATCH_DATA_ADDR")
                 .handler(buffer -> {
                     Buffer body = (Buffer) buffer.body();

@@ -36,11 +36,11 @@ public class WebSocketConfig {
         SockJSHandler sockJSHandler = SockJSHandler.create(vertx);
 
         // 只允许成交、委托变动通过总线往外发送
-        BridgeOptions options = new BridgeOptions()
+        SockJSBridgeOptions options = new SockJSBridgeOptions()
                 .addInboundPermitted(new PermittedOptions().setAddress(L1_MARKET_DATA_PREFIX))
                 .addOutboundPermitted(new PermittedOptions().setAddressRegex(ORDER_NOTIFY_ADDR_PREFIX))
                 .addOutboundPermitted(new PermittedOptions().setAddressRegex(TRADE_NOTIFY_ADDR_PREFIX));
-        sockJSHandler.bridge((SockJSBridgeOptions) options, event -> {
+        sockJSHandler.bridge(options, event -> {
             if (event.type() == BridgeEventType.SOCKET_CREATED) {
                 log.info("client : {} connected", event.socket().remoteAddress());
             } else if (event.type() == BridgeEventType.SOCKET_CLOSED) {

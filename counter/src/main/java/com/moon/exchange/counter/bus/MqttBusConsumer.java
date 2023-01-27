@@ -46,10 +46,10 @@ public class MqttBusConsumer {
     private Vertx vertx;
 
     public void startUp() {
-
+        mqttConnect(vertx, busPort, busIp);
     }
 
-    private final static String QUOTATION_ADDR = "-1";
+    private static final String QUOTATION_ADDR = "-1";
 
     public static final String INNER_MARKET_DATA_CACHE_ADDR = "l1_market_data_cache_addr";
 
@@ -75,9 +75,9 @@ public class MqttBusConsumer {
 
                     if (ArrayUtils.isNotEmpty(body)) {
                         short msgType = msg.getMsgType();
-                        if (msgType == MATCH_QUOTATION_DATA) {
+                        if (msgType == MATCH_ORDER_DATA) {
                             vertx.eventBus().send(INNER_MATCH_DATA_ADDR, Buffer.buffer(body));
-                        } else if (msgType == MATCH_ORDER_DATA) {
+                        } else if (msgType == MATCH_QUOTATION_DATA) {
                             vertx.eventBus().send(INNER_MARKET_DATA_CACHE_ADDR, Buffer.buffer(body));
                         } else {
                             log.error("recv unknown msgType: {}", msg);
